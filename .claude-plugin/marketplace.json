@@ -1,0 +1,16 @@
+{
+  "name": "desloppify",
+  "owner": {
+    "name": "Paul Bellamy"
+  },
+  "metadata": {
+    "description": "Systematic codebase quality scanner with persistent scoring across 20 dimensions."
+  },
+  "plugins": [
+    {
+      "name": "desloppify",
+      "source": "./",
+      "description": "Systematic codebase quality scanner with persistent scoring across 20 dimensions."
+    }
+  ]
+}

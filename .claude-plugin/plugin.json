@@ -1,0 +1,10 @@
+{
+  "name": "desloppify",
+  "version": "1.0.0",
+  "description": "Systematic codebase quality scanner with persistent scoring across 20 dimensions.",
+  "author": {
+    "name": "Paul Bellamy"
+  },
+  "repository": "https://github.com/paulbellamy/desloppify",
+  "license": "MIT"
+}
