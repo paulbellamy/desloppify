@@ -1,10 +1,10 @@
 # Desloppify
 
-A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin for systematic codebase quality scanning with persistent scoring across 20 dimensions.
+Systematic codebase quality scanning with persistent scoring across 20 dimensions. Ships as both a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin and a set of [Devin](https://devin.ai) skills, sharing the same reference material and scoring script.
 
 Inspired by [peteromallet/desloppify](https://github.com/peteromallet/desloppify).
 
-## Install
+## Install — Claude Code
 
 ```sh
 # Add the marketplace
@@ -14,22 +14,30 @@ Inspired by [peteromallet/desloppify](https://github.com/peteromallet/desloppify
 /plugin install desloppify
 ```
 
+Invoke commands as `/desloppify:<name>`.
+
+## Install — Devin
+
+Devin auto-discovers skills under `.agents/skills/` in the repository. Once this repo is connected to your Devin workspace, the skills are available as `desloppify-scan`, `desloppify-review`, `desloppify-triage`, `desloppify-next`, `desloppify-status`, and `desloppify-resolve`. Invoke them by name or `@skills:<name>`.
+
+The Devin skills are functionally equivalent to the Claude Code commands but run the four review batches **sequentially** (Devin's child sessions run on separate VMs and can't share `.desloppify/state.json`, so the parallel-subagent pattern is flattened to a single thorough pass). Scoring, state schema, and dimension definitions are identical.
+
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `/desloppify:scan` | Full scan (linters + subjective review) |
-| `/desloppify:review` | Subjective review only (4 parallel subagents) |
-| `/desloppify:triage` | Analyze, cluster, and plan work queue |
-| `/desloppify:next` | Show and work next queue item |
-| `/desloppify:status` | Show scores and progress |
-| `/desloppify:resolve <pattern> [--fixed\|--wontfix\|--false-positive]` | Mark items as resolved |
+| Claude Code | Devin Skill | Description |
+|-------------|-------------|-------------|
+| `/desloppify:scan` | `desloppify-scan` | Full scan (linters + subjective review) |
+| `/desloppify:review` | `desloppify-review` | Subjective review only |
+| `/desloppify:triage` | `desloppify-triage` | Analyze, cluster, and plan work queue |
+| `/desloppify:next` | `desloppify-next` | Show and work next queue item |
+| `/desloppify:status` | `desloppify-status` | Show scores and progress |
+| `/desloppify:resolve <pattern> [--fixed\|--wontfix\|--false-positive]` | `desloppify-resolve` | Mark items as resolved |
 
 ## How it works
 
 Main cycle: **scan -> triage -> execute -> rescan**.
 
-**Scan** runs mechanical linters (ruff, eslint, clippy, etc.) and launches 4 parallel review subagents that score the codebase across 20 quality dimensions. Results are persisted to `.desloppify/state.json`.
+**Scan** runs mechanical linters (ruff, eslint, clippy, etc.) and reviews the codebase across 20 quality dimensions — as 4 parallel subagents under Claude Code, or as 4 sequential batches under Devin. Results are persisted to `.desloppify/state.json`.
 
 **Scoring** combines 25% mechanical (linter findings) + 75% subjective (review assessments). The **strict score** penalizes wontfix items -- the gap between overall and strict is your wontfix debt.
 
