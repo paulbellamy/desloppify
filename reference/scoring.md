@@ -51,8 +51,14 @@ Direct 0-100 scores from review assessments.
 | ai generated debt | 4.0    | ai_generated_debt |
 | test strategy     | 4.0    | test_strategy |
 | design coherence  | 10.0   | design_coherence |
+| init coupling     | 1.0    | initialization_coupling |
+| convention drift  | 1.0    | convention_outlier |
+| dep health        | 1.0    | dependency_health |
+| api coherence     | 1.0    | api_surface_coherence |
+| auth consistency  | 1.0    | authorization_consistency |
+| stale migration   | 1.0    | incomplete_migration |
 
-Subjective score = weighted average of assessed dimension scores (0-100 each).
+Subjective score = weighted average of assessed dimension scores (0-100 each). Every assessed dimension counts: one missing from the table above still scores under its own name at the default weight of 1.0 (upstream desloppify semantics — dimensions are never silently dropped).
 
 Dimensions not yet assessed are excluded from the average (weight redistributed). This means subjective score starts undefined until first review.
 
