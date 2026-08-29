@@ -48,7 +48,8 @@ Direct 0-100 scores from review assessments.
 | structure nav     | 5.0    | package_organization + cross_module_architecture |
 | error consistency | 3.0    | error_consistency |
 | naming quality    | 2.0    | naming_quality |
-| ai generated debt | 1.0    | ai_generated_debt |
+| ai generated debt | 4.0    | ai_generated_debt |
+| test strategy     | 4.0    | test_strategy |
 | design coherence  | 10.0   | design_coherence |
 
 Subjective score = weighted average of assessed dimension scores (0-100 each).

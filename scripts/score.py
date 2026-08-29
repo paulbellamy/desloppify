@@ -24,7 +24,8 @@ SUBJECTIVE_WEIGHTS = {
     "structure nav": 5.0,
     "error consistency": 3.0,
     "naming quality": 2.0,
-    "ai generated debt": 1.0,
+    "ai generated debt": 4.0,
+    "test strategy": 4.0,
     "design coherence": 10.0,
 }
 
@@ -42,6 +43,7 @@ DIMENSION_MAP = {
     "error_consistency": "error consistency",
     "naming_quality": "naming quality",
     "ai_generated_debt": "ai generated debt",
+    "test_strategy": "test strategy",
     "design_coherence": "design coherence",
 }
 
