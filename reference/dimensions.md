@@ -128,12 +128,16 @@ LLM-hallmark patterns: restating comments, defensive overengineering, boilerplat
 - Pass-through wrapper functions with no added logic (just forward args to another function)
 - Generic names in domain code: handleData, processItem, doOperation where domain terms exist
 - Identical boilerplate error handling copied verbatim across multiple files
+- Fictitious edge cases: branches handling states that cannot occur — inputs the type system already excludes, fallbacks for configurations that can't exist
+- Redundant timeouts stacked at every layer of a call path when a single timeout at the boundary that owns the deadline would cover it
+- Additive patching: layers that compensate for a bad upstream premise instead of deleting it — V2 functions living beside their V1, flags that disable earlier behavior, transforms that fix up another layer's output
 
 **Skip:**
 - Comments explaining WHY (business rules, non-obvious constraints, external dependencies)
 - Defensive checks at genuine API boundaries (user input, network, file I/O)
 - Generated code (protobuf, GraphQL codegen, ORM migrations)
 - Wrapper functions that add auth, logging, metrics, or caching
+- A single deliberate timeout at the boundary that owns the deadline, or timeouts a library API requires
 
 ---
 
@@ -146,6 +150,7 @@ Clear decomposition, coherent ownership, domain-aligned structure.
 - Public surface (exports/entry points) is small and consistent with stated responsibility
 - Project contracts and reference docs match runtime reality (README/structure/philosophy are trustworthy)
 - Subsystem decomposition localizes change without surprising ripple edits
+- Subsystem responsibilities are disjoint — no two subsystems each partially own the same concern, leaving it unclear which one to change
 - A small set of architectural patterns is used consistently across major areas
 
 **Skip:**
@@ -165,6 +170,7 @@ Quality of handoffs and integration seams across modules and layers.
 - Error and lifecycle propagation across boundaries follows predictable patterns
 - Orchestration reads as composition of collaborators, not tangled back-and-forth calls
 - Integration seams avoid glue-code entropy (ad-hoc mappers and boundary conditionals)
+- Problems are solved at the layer that owns the cause, not patched where the symptom surfaces (e.g. retry logic in the UI, validation in the storage adapter)
 
 **Skip:**
 - When top-level decomposition/package shape is the PRIMARY issue, report under high_level_elegance
@@ -202,6 +208,7 @@ Dependency direction, cycles, hub modules, and boundary integrity.
 - Cross-module coordination through shared mutable state or import-time side effects
 - Compatibility shim paths that persist without active external need and blur boundaries
 - Cross-package duplication that indicates a missing shared boundary
+- Duplicate sources of truth: the same state or config maintained in two places, with machinery invented to keep them synchronized
 - Subsystem or package consuming a disproportionate share of the codebase
 
 **Skip:**
@@ -275,6 +282,7 @@ Untested critical paths, coupling, snapshot overuse, fragility patterns.
 - Snapshot test overuse: >50% of tests are snapshot-based
 - Missing integration tests: unit tests exist but no cross-module verification
 - Test fragility: tests that depend on timing, ordering, or external state
+- Production code that exists purely to satisfy tests: `if TESTING` branches, test-only hooks or exports, injection seams used only by mocks
 
 **Skip:**
 - Low-value files intentionally untested (types, constants, index files)
@@ -359,6 +367,7 @@ Are structural design decisions sound — functions focused, abstractions earned
 - Parameter lists that should be config/context objects — many related params passed together
 - Files accumulating issues across many dimensions — likely mixing unrelated concerns
 - Deep nesting that could be flattened with early returns or extraction
+- Derived values stored alongside their source and manually kept in sync, instead of computed on demand
 - Repeated structural patterns that should be data-driven
 
 **Skip:**
