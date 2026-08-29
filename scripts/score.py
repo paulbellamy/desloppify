@@ -24,11 +24,21 @@ SUBJECTIVE_WEIGHTS = {
     "structure nav": 5.0,
     "error consistency": 3.0,
     "naming quality": 2.0,
-    "ai generated debt": 1.0,
+    "ai generated debt": 4.0,
+    "test strategy": 4.0,
     "design coherence": 10.0,
+    "init coupling": 1.0,
+    "convention drift": 1.0,
+    "dep health": 1.0,
+    "api coherence": 1.0,
+    "auth consistency": 1.0,
+    "stale migration": 1.0,
 }
 
-# Maps review dimension names to subjective scoring dimension names
+# Maps review dimension names to subjective scoring dimension names.
+# Dimensions absent from this map still count: they score under their own
+# name (underscores as spaces) at the default weight of 1.0, matching
+# upstream peteromallet/desloppify semantics.
 DIMENSION_MAP = {
     "high_level_elegance": "high elegance",
     "mid_level_elegance": "mid elegance",
@@ -42,7 +52,14 @@ DIMENSION_MAP = {
     "error_consistency": "error consistency",
     "naming_quality": "naming quality",
     "ai_generated_debt": "ai generated debt",
+    "test_strategy": "test strategy",
     "design_coherence": "design coherence",
+    "initialization_coupling": "init coupling",
+    "convention_outlier": "convention drift",
+    "dependency_health": "dep health",
+    "api_surface_coherence": "api coherence",
+    "authorization_consistency": "auth consistency",
+    "incomplete_migration": "stale migration",
 }
 
 # Maps linter source categories to mechanical dimensions
@@ -113,16 +130,14 @@ def compute_subjective(dimension_scores):
     total_score = 0.0
     scores = {}
 
-    for review_dim, subj_dim in DIMENSION_MAP.items():
-        if review_dim in dimension_scores:
-            entry = dimension_scores[review_dim]
-            s = entry.get("score", 0) if isinstance(entry, dict) else float(entry)
-            w = SUBJECTIVE_WEIGHTS.get(subj_dim, 1.0)
-            # Average if multiple review dims map to same subjective dim
-            if subj_dim in scores:
-                scores[subj_dim] = (scores[subj_dim] + s) / 2
-            else:
-                scores[subj_dim] = s
+    for review_dim, entry in dimension_scores.items():
+        subj_dim = DIMENSION_MAP.get(review_dim, review_dim.replace("_", " "))
+        s = entry.get("score", 0) if isinstance(entry, dict) else float(entry)
+        # Average if multiple review dims map to same subjective dim
+        if subj_dim in scores:
+            scores[subj_dim] = (scores[subj_dim] + s) / 2
+        else:
+            scores[subj_dim] = s
 
     for dim, s in scores.items():
         w = SUBJECTIVE_WEIGHTS.get(dim, 1.0)
