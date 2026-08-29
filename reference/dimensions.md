@@ -109,7 +109,7 @@ Abstractions that pay for themselves with real leverage.
 - Getter functions whose body is solely return x.get(key) — the underlying type should be an object with properties
 
 **Skip:**
-- Dependency-injection or framework abstractions required for wiring/testability
+- Dependency-injection or framework abstractions required for wiring/testability (if a seam exists solely so tests can mock, report under test_strategy)
 - Adapters that intentionally isolate external API volatility
 - Cases where abstraction clearly reduces duplication across multiple callers
 - Thin wrappers that consistently enforce policy (auth/logging/metrics/caching)
@@ -128,8 +128,8 @@ LLM-hallmark patterns: restating comments, defensive overengineering, boilerplat
 - Pass-through wrapper functions with no added logic (just forward args to another function)
 - Generic names in domain code: handleData, processItem, doOperation where domain terms exist
 - Identical boilerplate error handling copied verbatim across multiple files
-- Fictitious edge cases: branches handling states that cannot occur — inputs the type system already excludes, fallbacks for configurations that can't exist
-- Redundant timeouts stacked at every layer of a call path when a single timeout at the boundary that owns the deadline would cover it
+- Fictitious edge cases: branches for states unreachable from any call site, fallbacks for configurations that can't exist
+- Redundant timeouts at multiple layers of a call path when a single timeout at the boundary that owns the deadline would cover it
 - Additive patching: layers that compensate for a bad upstream premise instead of deleting it — V2 functions living beside their V1, flags that disable earlier behavior, transforms that fix up another layer's output
 
 **Skip:**
@@ -138,6 +138,7 @@ LLM-hallmark patterns: restating comments, defensive overengineering, boilerplat
 - Generated code (protobuf, GraphQL codegen, ORM migrations)
 - Wrapper functions that add auth, logging, metrics, or caching
 - A single deliberate timeout at the boundary that owns the deadline, or timeouts a library API requires
+- Old/new coexistence that is an active tracked migration or backward-compat need — report under incomplete_migration
 
 ---
 
@@ -170,7 +171,7 @@ Quality of handoffs and integration seams across modules and layers.
 - Error and lifecycle propagation across boundaries follows predictable patterns
 - Orchestration reads as composition of collaborators, not tangled back-and-forth calls
 - Integration seams avoid glue-code entropy (ad-hoc mappers and boundary conditionals)
-- Problems are solved at the layer that owns the cause, not patched where the symptom surfaces (e.g. retry logic in the UI, validation in the storage adapter)
+- Problems are solved at the layer that owns the cause, not patched where the symptom surfaces (e.g. retry logic in the UI, input validation deferred to the storage adapter)
 
 **Skip:**
 - When top-level decomposition/package shape is the PRIMARY issue, report under high_level_elegance
@@ -375,4 +376,5 @@ Are structural design decisions sound — functions focused, abstractions earned
 - Parameter lists where grouping would obscure meaning — do NOT recommend config/context objects or dependency injection wrappers just to reduce parameter count; only group when the grouping has independent semantic meaning
 - Files that are large because their domain is genuinely complex, not because they mix concerns
 - Nesting that is inherent to the problem (e.g., recursive tree processing)
+- Deliberate performance caches or denormalization with a clear invalidation strategy
 - Do NOT recommend extracting callable parameters or injecting dependencies for "testability" — direct function calls are simpler and preferred unless there is a concrete decoupling need
